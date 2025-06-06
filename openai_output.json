@@ -1,0 +1,44 @@
+{
+  "Slide 1": {
+    "Client Company Name": "LedgerUp"
+  },
+  "Slide 13": {
+    "Slide13_Heading": "Company Snapshot",
+    "ClientName": "LedgerUp",
+    "Industry": "Software Development",
+    "Location": "San Francisco, California, US",
+    "Employees": "2-10 employees",
+    "ClientSummary": "LedgerUp specializes in transforming how businesses manage their revenue and accounts receivable, helping founders and teams gain clarity on their financial operations."
+  },
+  "Slide 14": {
+    "Slide14_Heading": "Key Challenges",
+    "ClientChallenge1": "Manual follow-ups and unbilled usage leading to revenue leakage.",
+    "ClientChallenge2": "Disconnected systems causing difficulties in tracking contracts, invoices, and payments.",
+    "ClientChallenge3": "Messy spreadsheets making it hard to track recurring revenue.",
+    "ChallengeImpact": "These challenges result in lost invoices, late payments, and significant time spent on manual processes."
+  },
+  "Slide 15": {
+    "Slide15_Heading": "ActionSync in Action",
+    "ClientApps": "Salesforce, HubSpot, DocuSign, Stripe, QuickBooks.",
+    "ClientDocs": "Customer contracts, invoices, receipts.",
+    "ClientTools": "Slack for communication and automation."
+  },
+  "Slide 16": {
+    "Slide16_Heading": "Use Case Scenarios",
+    "ClientUseCaseA": "Automating the entire revenue flow from signed contract to paid invoice.",
+    "ClientUseCaseB": "Streamlining billing and payment systems to reduce manual reconciliation.",
+    "ClientUseCaseC": "Tracking usage-based billing and invoicing accurately without human intervention."
+  },
+  "Slide 17": {
+    "Slide17_Heading": "Proposal & POC Plan",
+    "PilotProposal": "Implement a pilot program to integrate ActionSync with LedgerUp's existing systems.",
+    "RelevantFeatures": "Personalized search, team search, and automation of invoicing processes.",
+    "ClientPainPoints": "Manual billing processes, disconnected data, and unclear revenue tracking.",
+    "SuccessMetrics": "Reduction in time spent on invoicing, improved collection speed, and enhanced accuracy.",
+    "POCTimeline": "3 months for initial implementation and evaluation."
+  },
+  "Slide 18": {
+    "Slide18_Heading": "Next Steps",
+    "CallToAction": "Schedule a demo to explore how ActionSync can automate and enhance LedgerUp's billing processes."
+  }
+}
