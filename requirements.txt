@@ -1,0 +1,11 @@
+aiohttp==3.12.7
+anyio==4.9.0
+colorama==0.4.6
+dotenv==0.9.9
+openai==1.84.0
+playwright==1.52.0
+pillow==11.2.1
+python-dotenv==1.1.0
+python-pptx==1.0.2
+requests==2.32.3
+re==0.0.2
