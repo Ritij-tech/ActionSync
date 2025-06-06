@@ -1,35 +1,75 @@
-# ActionSync AI-Powered Sales Deck Generator
+# ActionSync Sales Deck Automation
 
-Automatically create a personalized sales pitch deck using a client’s website and LinkedIn data, combined with OpenAI-generated slide content and branding elements.
+> Proprietary B2B pitch deck automation tool customized for internal use by ActionSync. Developed by Ritij Srivastava (Founder, Vertaflow).
 
 ---
 
 ## Overview
 
-ActionSync automates the manual, repetitive task of creating personalized B2B sales pitch decks. It scrapes key business information, generates relevant content using GPT, and injects it into a pre-designed PowerPoint template—complete with logos and summaries.
+This project streamlines B2B pitch deck creation by:
 
-### Core Functionality
+* Scraping the company website
+* Logging into and scraping the LinkedIn company profile (and logo)
+* Using GPT (via OpenAI) to generate slide content
+* Inserting that content and logo into a .pptx template
 
-* Scrapes **company website** and **LinkedIn company page**
-* Downloads and embeds the **company logo**
-* Uses **OpenAI GPT (gpt-4o-mini)** to generate tailored slide content
-* Populates a .PPTX template with all generated data
-* Outputs a client-ready deck with **one command**
+### Bonus:
 
-### Bonus Feature
+You can also run `Personalized_Message.py` separately to:
 
-* A separate script for scraping a **LinkedIn profile** and generating a smart prospect message
+* Scrape a LinkedIn **person's profile**
+* Generate a smart outreach summary using GPT
 
 ---
 
 ## Features
 
-* Automates all steps from data scraping to deck generation
-* Scrapes structured content and posts from LinkedIn
-* Extracts and places the company’s logo into slide 13
-* Summarizes profile data into outreach insights
-* Fully command-line operated; no manual edits required
-* Cross-platform: **Works on Windows, macOS, and Linux**
+* Fully automated deck generation by running just one command
+* Scrapes both website + LinkedIn company page
+* Inserts scraped **company logo** into the pitch deck
+* Uses `gpt-4o-mini` to create custom slide content
+* Outputs a ready-to-send PowerPoint file
+
+---
+
+## Requirements
+
+> Works on **Windows**, **macOS**, or **Linux** (Python 3.9+)
+
+### 1. Clone the Repo
+
+```bash
+git clone https://github.com/Ritij-AI-Artisan/ActionSync.git
+cd ActionSync
+```
+
+### 2. Setup Python Virtual Environment
+
+#### Windows:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+#### macOS/Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Install Playwright Browsers
+
+```bash
+playwright install
+```
 
 ---
 
@@ -37,111 +77,62 @@ ActionSync automates the manual, repetitive task of creating personalized B2B sa
 
 ```
 ActionSync/
-├── app.py                       # Entry point – runs scraper, GPT, and slide update
-├── Scraper.py                   # Scrapes company site and LinkedIn (with logo)
-├── LLM_output.py                # Generates slide content via GPT
-├── Personalized_Message.py      # (Optional) Scrapes a LinkedIn person’s profile
-├── ActionSync_details.txt       # Boilerplate info used in GPT prompts
-├── openai_output.json           # GPT response for slides 1, 13–18
-├── scraped/                     # Contains:
-│   ├── logo.png                 # Company logo from LinkedIn
-│   ├── message.txt              # Raw LinkedIn profile (optional)
-│   ├── prospect.txt             # GPT summary of the profile (optional)
-│   └── prospect.json            # All scraped input data
-├── output/                      # Final deck output
-├── .env                         # API and login credentials (not committed)
-├── requirements.txt             # Python dependencies
+├── app.py                       # Entry point (run this)
+├── Scraper.py                   # Scrapes website + LinkedIn + logo
+├── LLM_output.py                # Generates JSON slide content using GPT
+├── Personalized_Message.py     # (Optional) Scrapes a person's LinkedIn profile
+├── ActionSync_details.txt       # Company boilerplate (used in GPT prompt)
+├── openai_output.json           # GPT-generated content
+├── scraped/                     # Stores scraped JSON, logo.png, message.txt
+├── output/                      # Final generated PPT decks
+├── .env                         # Store API keys + LinkedIn login
+├── requirements.txt             # All dependencies
+├── LICENSE                      # Custom license (see below)
 ```
 
 ---
 
-## Getting Started
+## .env Format
 
-> These instructions work for **Windows**, **macOS**, and **Linux**
+Create a `.env` file in the root directory:
 
-### Step 1: Clone the Repository
-
-```bash
-git clone https://github.com/Ritij-AI-Artisan/ActionSync.git
-cd ActionSync
-```
-
-### Step 2: Create Virtual Environment
-
-#### On Windows
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-```
-
-#### On macOS/Linux
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### Step 3: Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Step 4: Install Playwright Browsers
-
-```bash
-playwright install
-```
-
-### Step 5: Configure Environment Variables
-
-Create a `.env` file in the root directory with:
-
-```
-OPENAI_API_KEY=your_openai_key
-LINKEDIN_EMAIL=your_linkedin_email
-LINKEDIN_PASSWORD=your_linkedin_password
+```env
+OPENAI_API_KEY=your-openai-key
+LINKEDIN_EMAIL=your-email
+LINKEDIN_PASSWORD=your-password
 ```
 
 ---
 
-## Running the Automation
-
-### Generate Sales Deck (Full Flow)
+## Run the Full Pipeline
 
 ```bash
 python app.py
 ```
 
-You’ll be prompted to enter:
+You'll be prompted to input:
 
 * Company Website URL
 * LinkedIn Company Page URL
 
-This will generate:
+The deck will be saved under `output/Final_ActionSync_Deck_<Client>.pptx`
 
-* `scraped/prospect.json` (scraped data)
-* `scraped/logo.png` (company logo)
-* `openai_output.json` (slide content from GPT)
-* `output/Final_ActionSync_Deck_<ClientName>.pptx` (final deck)
+---
 
-### Generate Prospect Summary (Optional)
+## (Optional) Run Prospect Intelligence
 
 ```bash
 python Personalized_Message.py
 ```
 
-You’ll be prompted to enter a **LinkedIn profile URL** of a person.
+Enter a LinkedIn **profile URL** and it will output:
 
-This generates:
-
-* `scraped/message.txt` (raw scraped profile)
-* `scraped/prospect.txt` (GPT summary)
+* `scraped/message.txt` — full scraped profile text
+* `scraped/prospect.txt` — GPT-written summary
 
 ---
 
-## requirements.txt (Final Cleaned List)
+## requirements.txt
 
 ```
 aiohttp==3.12.7
@@ -157,15 +148,15 @@ requests==2.32.3
 re==0.0.2
 ```
 
-> This file includes only direct and relevant dependencies for core functionality.
+> This list includes only required packages. No redundancies.
 
 ---
 
-## Updating the Repository
+## Updating the Repo
 
 ```bash
 git add .
-git commit -m "Updated scraping logic and logo embedding"
+git commit -m "Refactor: updated scraping + logo injection"
 git push
 ```
 
@@ -173,14 +164,25 @@ git push
 
 ## Troubleshooting
 
-* **playwright.errors**: Run `playwright install`
-* **Deck not updating**: Ensure `ActionSync_details.txt` exists and `.env` is filled
-* **Missing logo**: LinkedIn logo might not load due to privacy or login restrictions
+* `playwright` errors? ➡ Run `playwright install`
+* Deck not generating? ➡ Ensure `.env` and `ActionSync_details.txt` exist
+* Logo not inserting? ➡ Make sure the LinkedIn page has a logo image
 
 ---
 
-## Author
+## Licensing
 
-Made by Ritij Srivastava — [GitHub Profile](https://github.com/Ritij-AI-Artisan)
+This project is **not open-source**.
 
-For enterprise use, contributions, or licensing queries, please open an issue or contact directly.
+> This codebase is the intellectual property of **Ritij Srivastava (Founder, Vertaflow)** and is licensed **solely for internal use by Mr. Tushar Dublish (Founder, ActionSync)**.
+
+* Redistribution, sublicensing, or commercial resale is **strictly prohibited** without **written permission** from Ritij Srivastava.
+* The product may not be integrated into a paid/proprietary software platform without prior agreement.
+* Violations will result in legal action.
+
+See [LICENSE](LICENSE) for full legal terms.
+
+---
+
+## Built with dedication by [Ritij Srivastava](https://github.com/Ritij-AI-Artisan)
+
