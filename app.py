@@ -1,101 +1,105 @@
 import subprocess
+import sys
 import json
 import os
-from pptx import Presentation
-from pptx.util import Inches
-from pptx.enum.shapes import MSO_SHAPE_TYPE
-from PIL import Image
+from datetime import date
+from docx import Document
 
-print("Running scraper.py...")
-subprocess.run([r"C:\Users\sriva\PycharmProjects\Sales_Deck\.venv/Scripts\python.exe", "scraper.py"], check=True)
 
-print("Running LLM_output.py...")
-subprocess.run([r"C:\Users\sriva\PycharmProjects\Sales_Deck\.venv/Scripts\python.exe", "LLM_output.py"], check=True)
+def run(script: str) -> None:
+    subprocess.run([sys.executable, script], check=True)
 
-pptx_template = r"E:\ActionSync.pptx"
-json_path = "openai_output.json"
-prs = Presentation(pptx_template)
 
-with open(json_path, "r", encoding="utf-8") as f:
-    data = json.load(f)
+def replace_placeholders(doc: Document, mapping: dict) -> None:
+    for paragraph in doc.paragraphs:
+        for key, value in mapping.items():
+            placeholder = f"{{{key}}}"
+            if placeholder in paragraph.text:
+                for run in paragraph.runs:
+                    if placeholder in run.text:
+                        run.text = run.text.replace(placeholder, str(value))
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    for key, value in mapping.items():
+                        placeholder = f"{{{key}}}"
+                        if placeholder in paragraph.text:
+                            for run in paragraph.runs:
+                                if placeholder in run.text:
+                                    run.text = run.text.replace(placeholder, str(value))
 
-slide_1_data = data.get("Slide 1", {})
-client_name = slide_1_data.get("Client Company Name", "Client")
 
-slide_1 = prs.slides[0]
-for shape in slide_1.shapes:
-    if shape.has_text_frame and "{Client Company Name}" in shape.text:
-        shape.text = shape.text.replace("{Client Company Name}", client_name)
+if __name__ == "__main__":
+    print("Running Scraper.py...")
+    run("Scraper.py")
 
-def fill_slide(slide, replacements: dict):
-    for shape in slide.shapes:
-        if shape.has_text_frame:
-            new_text = shape.text
-            for key, value in replacements.items():
-                placeholder = f"{{{key}}}"
-                if placeholder in new_text:
-                    new_text = new_text.replace(placeholder, str(value))
-            shape.text_frame.clear()
-            shape.text_frame.text = new_text
+    print("Running LLM_output.py...")
+    run("LLM_output.py")
 
-def insert_logo_image(slide):
-    logo_path = "scraped/logo.png"
-    if os.path.exists(logo_path):
-        try:
-            with Image.open(logo_path) as img:
-                img.verify()
-            left = Inches(6.5)
-            top = Inches(2.0)
-            height = Inches(1.2)
-            for shape in list(slide.shapes):
-                if shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
-                    slide.shapes._spTree.remove(shape._element)
-            slide.shapes.add_picture(logo_path, left, top, height=height)
-            print("Logo successfully inserted on Slide 13.")
-        except Exception as e:
-            print(f"Failed to insert logo: {e}")
+    with open("openai_output.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
 
-slide_map = {
-    13: ("Slide 13", "Slide13_Heading"),
-    14: ("Slide 14", "Slide14_Heading"),
-    15: ("Slide 15", "Slide15_Heading"),
-    16: ("Slide 16", "Slide16_Heading"),
-    17: ("Slide 17", "Slide17_Heading"),
-    18: ("Slide 18", "Slide18_Heading")
-}
+    doc = Document("Digital_Presence_Audit_Template.docx")
 
-if "slides" in data:
-    for entry in data["slides"]:
-        slide_num = entry.get("slide")
-        content = entry.get("content", {})
-        flat = {}
-        for section in content.values():
-            if isinstance(section, dict):
-                flat.update(section)
-            else:
-                flat = content
-                break
-        slide = prs.slides[slide_num - 1]
-        flat["ClientName"] = client_name
-        fill_slide(slide, flat)
-        if slide_num == 13:
-            insert_logo_image(slide)
-else:
-    for slide_num, (slide_key, heading_key) in slide_map.items():
-        slide = prs.slides[slide_num - 1]
-        slide_data = data.get(slide_key, {})
-        heading_text = slide_data.get(heading_key)
-        if heading_text:
-            for shape in slide.shapes:
-                if shape.has_text_frame and f"{{{heading_key}}}" in shape.text:
-                    shape.text = shape.text.replace(f"{{{heading_key}}}", heading_text)
-        slide_data["ClientName"] = client_name
-        fill_slide(slide, slide_data)
-    insert_logo_image(prs.slides[12])
+    page1 = {
+        "ProspectName": data.get("ProspectName", "Prospect"),
+        "AuditDate": date.today().strftime("%Y-%m-%d"),
+    }
+    replace_placeholders(doc, page1)
 
-output_dir = "output"
-os.makedirs(output_dir, exist_ok=True)
-output_file = os.path.join(output_dir, f"Final_ActionSync_Deck_{client_name.replace(' ', '_')}.pptx")
-prs.save(output_file)
+    page2 = {
+        "StrategicInsight": data.get("StrategicInsight", ""),
+        "CXOPositioning": data.get("CXOPositioning", ""),
+    }
+    replace_placeholders(doc, page2)
 
-print(f"Presentation saved as {output_file}")
+    page3 = {
+        "ProfilePhotoStatus": data.get("ProfilePhotoStatus", ""),
+        "ProfilePhotoFixable": data.get("ProfilePhotoFixable", ""),
+        "HeadlineStatus": data.get("HeadlineStatus", ""),
+        "HeadlineFixable": data.get("HeadlineFixable", ""),
+        "CoverImageStatus": data.get("CoverImageStatus", ""),
+        "CoverImageFixable": data.get("CoverImageFixable", ""),
+        "AboutNarrativeStatus": data.get("AboutNarrativeStatus", ""),
+        "AboutFixable": data.get("AboutFixable", ""),
+        "FirstImpressionSummary": data.get("FirstImpressionSummary", ""),
+    }
+    replace_placeholders(doc, page3)
+
+    page4 = {
+        "TotalFollowers": data.get("TotalFollowers", ""),
+        "PeerFollowers": data.get("PeerFollowers", ""),
+        "PostsPerMonth": data.get("PostsPerMonth", ""),
+        "EngagementRate": data.get("EngagementRate", ""),
+        "DaysSinceLastPost": data.get("DaysSinceLastPost", ""),
+    }
+    replace_placeholders(doc, page4)
+
+    page5 = {
+        "AuthorityScore": data.get("AuthorityScore", ""),
+        "AuthorityNotes": data.get("AuthorityNotes", ""),
+        "ProofScore": data.get("ProofScore", ""),
+        "ProofNotes": data.get("ProofNotes", ""),
+        "FounderVisibilityScore": data.get("FounderVisibilityScore", ""),
+        "FounderNotes": data.get("FounderNotes", ""),
+        "TrustHookScore": data.get("TrustHookScore", ""),
+        "TrustHookNotes": data.get("TrustHookNotes", ""),
+    }
+    replace_placeholders(doc, page5)
+
+    page6 = {
+        "FixableGap1": data.get("FixableGap1", ""),
+        "FixableGap2": data.get("FixableGap2", ""),
+        "FixableGap3": data.get("FixableGap3", ""),
+    }
+    replace_placeholders(doc, page6)
+
+    os.makedirs("output", exist_ok=True)
+    filename = os.path.join(
+        "output",
+        f"Presence_Audit_{data.get('ProspectName', 'Prospect').replace(' ', '_')}.docx",
+    )
+    doc.save(filename)
+
+    print(f"Presence Audit saved as {filename}")
