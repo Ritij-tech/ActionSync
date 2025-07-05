@@ -98,6 +98,7 @@ Create a `.env` file in the root directory:
 
 ```env
 OPENAI_API_KEY=your-openai-key
+RELEVANCE_COMPANY_WEBHOOK_URL=https://example.com/linkedin-company
 LINKEDIN_EMAIL=your-email
 LINKEDIN_PASSWORD=your-password
 ```
