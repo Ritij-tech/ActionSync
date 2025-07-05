@@ -7,9 +7,10 @@ from dotenv import load_dotenv
 import requests
 
 load_dotenv()
-
-LINKEDIN_EMAIL = os.getenv("LINKEDIN_EMAIL")
-LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD")
+RELEVANCE_COMPANY_WEBHOOK_URL = os.getenv(
+    "RELEVANCE_COMPANY_WEBHOOK_URL",
+    "https://example.com/linkedin-company"
+)
 
 def clean_text(text):
     text = re.sub(r"[^\x00-\x7F]+", " ", text)
@@ -50,57 +51,45 @@ def scrape_company_website(url):
 
 def scrape_linkedin(linkedin_url):
     print(f"Scraping LinkedIn page: {linkedin_url}")
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        context = browser.new_context()
-        page = context.new_page()
-
-        page.goto("https://www.linkedin.com/login")
-        page.fill("input#username", LINKEDIN_EMAIL)
-        page.fill("input#password", LINKEDIN_PASSWORD)
-        page.click("button[type='submit']")
-        page.wait_for_timeout(5000)
-
-        page.goto(linkedin_url, timeout=60000)
-        page.wait_for_timeout(5000)
-
-        profile_text = page.inner_text("body")
-        structured_sections = extract_structured_sections(page)
-
-        posts = []
-        for _ in range(3):
-            page.mouse.wheel(0, 3000)
-            page.wait_for_timeout(3000)
-
-        post_elements = page.locator("div.feed-shared-update-v2")
-        for i in range(min(5, post_elements.count())):
-            try:
-                post_text = post_elements.nth(i).inner_text(timeout=3000)
-                posts.append(clean_text(post_text))
-            except:
-                continue
-
-        logo_url = ""
-        try:
-            logo = page.locator("img.org-top-card-primary-content__logo").first
-            logo_url = logo.get_attribute("src")
-            if logo_url:
-                os.makedirs("scraped", exist_ok=True)
-                img_data = requests.get(logo_url).content
-                with open("scraped/logo.png", "wb") as handler:
-                    handler.write(img_data)
-        except:
-            pass
-
-        browser.close()
-
+    try:
+        res = requests.post(
+            RELEVANCE_COMPANY_WEBHOOK_URL,
+            json={"linkedin_url": linkedin_url},
+            timeout=30,
+        )
+        res.raise_for_status()
+        data = res.json()
+    except Exception as e:
+        print(f"Webhook request failed: {e}")
         return {
             "linkedin_url": linkedin_url,
-            "linkedin_profile_text": clean_text(profile_text),
-            "linkedin_sections": structured_sections,
-            "linkedin_posts": posts,
-            "logo_url": logo_url
+            "linkedin_profile_text": "",
+            "linkedin_sections": [],
+            "linkedin_posts": [],
+            "logo_url": "",
         }
+
+    profile_text = data.get("profile_text") or data.get("text", "")
+    structured_sections = data.get("sections", [])
+    posts = data.get("posts", [])
+    logo_url = data.get("logo_url", "")
+
+    if logo_url:
+        try:
+            os.makedirs("scraped", exist_ok=True)
+            img_data = requests.get(logo_url).content
+            with open("scraped/logo.png", "wb") as handler:
+                handler.write(img_data)
+        except Exception:
+            pass
+
+    return {
+        "linkedin_url": linkedin_url,
+        "linkedin_profile_text": clean_text(profile_text),
+        "linkedin_sections": structured_sections,
+        "linkedin_posts": [clean_text(p) for p in posts],
+        "logo_url": logo_url,
+    }
 
 def save_combined_data(company_data, linkedin_data):
     combined = {**company_data, **linkedin_data}
