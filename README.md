@@ -1,17 +1,17 @@
-# ActionSync Sales Deck Automation
+# ActionSync Audit Automation
 
-> Proprietary B2B pitch deck automation tool customized for internal use by ActionSync. Developed by Ritij Srivastava (Founder, Vertaflow).
+> Proprietary audit automation tool customized for internal use by ActionSync. Developed by Ritij Srivastava (Founder, Vertaflow).
 
 ---
 
 ## Overview
 
-This project streamlines B2B pitch deck creation by:
+This project streamlines creation of a digital presence audit by:
 
 * Scraping the company website
 * Logging into and scraping the LinkedIn company profile (and logo)
-* Using GPT (via OpenAI) to generate slide content
-* Inserting that content and logo into a .pptx template
+* Using GPT (via OpenAI) to generate audit insights
+* Inserting those insights into a `.docx` template
 
 ### Bonus:
 
@@ -24,11 +24,11 @@ You can also run `Personalized_Message.py` separately to:
 
 ## Features
 
-* Fully automated deck generation by running just one command
+* Fully automated document generation by running just one command
 * Scrapes both website + LinkedIn company page
-* Inserts scraped **company logo** into the pitch deck
-* Uses `gpt-4o-mini` to create custom slide content
-* Outputs a ready-to-send PowerPoint file
+* Inserts scraped **company logo** into the audit document
+* Uses `gpt-4o-mini` to create custom text snippets
+* Outputs a ready-to-send Word document
 
 ---
 
@@ -79,12 +79,11 @@ playwright install
 ActionSync/
 ├── app.py                       # Entry point (run this)
 ├── Scraper.py                   # Scrapes website + LinkedIn + logo
-├── LLM_output.py                # Generates JSON slide content using GPT
+├── LLM_output.py                # Generates JSON audit data using GPT
 ├── Personalized_Message.py     # (Optional) Scrapes a person's LinkedIn profile
 ├── ActionSync_details.txt       # Company boilerplate (used in GPT prompt)
-├── openai_output.json           # GPT-generated content
 ├── scraped/                     # Stores scraped JSON, logo.png, message.txt
-├── output/                      # Final generated PPT decks
+├── output/                      # Final generated DOCX files
 ├── .env                         # Store API keys + LinkedIn login
 ├── requirements.txt             # All dependencies
 ├── LICENSE                      # Custom license (see below)
@@ -116,7 +115,7 @@ You'll be prompted to input:
 * Company Website URL
 * LinkedIn Company Page URL
 
-The deck will be saved under `output/Final_ActionSync_Deck_<Client>.pptx`
+The audit will be saved under `output/Presence_Audit_<Client>.docx`
 
 ---
 
@@ -144,9 +143,9 @@ openai==1.84.0
 playwright==1.52.0
 pillow==11.2.1
 python-dotenv==1.1.0
-python-pptx==1.0.2
 requests==2.32.3
 re==0.0.2
+python-docx==1.2.0
 ```
 
 > This list includes only required packages. No redundancies.
